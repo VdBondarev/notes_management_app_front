@@ -37,7 +37,12 @@ export const HomePage = () => {
     const handleAddNote = () => {
         dispatch(createNote({ title, content })).then(() => {
             // Reload the notes list without changing the current page
-            dispatch(fetchNotes({ page, size }));
+            dispatch(fetchNotes({ page, size })).then((action) => {
+                const notes = action.payload.notes;
+                if (notes.length === size) {
+                    setIsLastPage(false);
+                }
+            })
         }).catch(error => {
             console.error("Error creating note:", error);
         });
@@ -46,7 +51,7 @@ export const HomePage = () => {
 
     return (
         <div>
-            <h1>Notes List</h1>
+            <h1>Notes</h1>
             <ul>
                 {notes.map(note => (
                     <li key={note.id}>
