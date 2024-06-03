@@ -5,20 +5,20 @@ import { selectReducerNotes } from "../../store/selectors/notes";
 
 export const HomePage = () => {
     const dispatch = useDispatch();
-    const notes = useSelector(selectReducerNotes);
-    const [page, setPage] = useState(0); // State to manage the current page
+    const [page, setPage] = useState(0);
     const size = 6;
-    const [isLastPage, setIsLastPage] = useState(false); // State to check if the last page is reached
+    const [isLastPage, setIsLastPage] = useState(false);
+    const notes = useSelector(selectReducerNotes);
 
     useEffect(() => {
         dispatch(fetchNotes({ page, size })).then((action) => {
-            if (action.payload.notes.length < size) {
-                setIsLastPage(true);
-            } else {
-                setIsLastPage(false);
-            }
+            const notes = action.payload.notes;
+            setIsLastPage(notes.length < size);
+        }).catch(error => {
+            console.error("Error fetching notes:", error);
         });
     }, [dispatch, page, size]);
+
 
     const handlePreviousPage = () => {
         if (page > 0) {
@@ -53,7 +53,7 @@ export const HomePage = () => {
             </div>
             <div className="inpContainer">
                 <input type="text" className="input" placeholder="Type your note" />
-                <button className="btn add">Add note</button>
+                <button className="btn add">Add a note</button>
             </div>
         </div>
     );
