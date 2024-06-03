@@ -1,5 +1,3 @@
-// pages/homePage/HomePage.js
-
 import { useEffect, useState } from 'react';
 import { fetchNotes } from "../../store/reducers/notes";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,10 +7,17 @@ export const HomePage = () => {
     const dispatch = useDispatch();
     const notes = useSelector(selectReducerNotes);
     const [page, setPage] = useState(0); // State to manage the current page
-    const size = 6; // Page size
+    const size = 6;
+    const [isLastPage, setIsLastPage] = useState(false); // State to check if the last page is reached
 
     useEffect(() => {
-        dispatch(fetchNotes({ page, size }));
+        dispatch(fetchNotes({ page, size })).then((action) => {
+            if (action.payload.notes.length < size) {
+                setIsLastPage(true);
+            } else {
+                setIsLastPage(false);
+            }
+        });
     }, [dispatch, page, size]);
 
     const handlePreviousPage = () => {
@@ -22,7 +27,9 @@ export const HomePage = () => {
     };
 
     const handleNextPage = () => {
-        setPage(page + 1);
+        if (!isLastPage) {
+            setPage(page + 1);
+        }
     };
 
     return (
@@ -42,7 +49,7 @@ export const HomePage = () => {
             <div className="pagination">
                 <button onClick={handlePreviousPage} disabled={page === 0}>←</button>
                 <span>Page {page + 1}</span>
-                <button onClick={handleNextPage}>→</button>
+                <button onClick={handleNextPage} disabled={isLastPage}>→</button>
             </div>
             <div className="inpContainer">
                 <input type="text" className="input" placeholder="Type your note" />
