@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchNotes } from "../../store/reducers/notes";
+import { fetchNotes, createNote } from "../../store/reducers/notes";
 import { useDispatch, useSelector } from "react-redux";
 import { selectReducerNotes } from "../../store/selectors/notes";
 
@@ -9,6 +9,8 @@ export const HomePage = () => {
     const size = 6;
     const [isLastPage, setIsLastPage] = useState(false);
     const notes = useSelector(selectReducerNotes);
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
 
     useEffect(() => {
         dispatch(fetchNotes({ page, size })).then((action) => {
@@ -32,6 +34,16 @@ export const HomePage = () => {
         }
     };
 
+    const handleAddNote = () => {
+        dispatch(createNote({ title, content })).then(() => {
+            // Reload the notes list without changing the current page
+            dispatch(fetchNotes({ page, size }));
+        }).catch(error => {
+            console.error("Error creating note:", error);
+        });
+    };
+
+
     return (
         <div>
             <h1>Notes List</h1>
@@ -52,8 +64,28 @@ export const HomePage = () => {
                 <button onClick={handleNextPage} disabled={isLastPage}>→</button>
             </div>
             <div className="inpContainer">
-                <input type="text" className="input" placeholder="Type your note" />
-                <button className="btn add">Add a note</button>
+                <div>
+                    <label htmlFor="title">Title:</label>
+                    <input
+                        type="text"
+                        id="title"
+                        className="input"
+                        placeholder="Enter title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="content">Content:</label>
+                    <input
+                        id="content"
+                        className="input"
+                        placeholder="Enter content"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                    />
+                </div>
+                <button className="btn add" onClick={handleAddNote}>Add a note</button>
             </div>
         </div>
     );
