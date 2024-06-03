@@ -1,8 +1,8 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 
 
-export const fetchNotes = createAsyncThunk('/api/notes', async () => {
-    const response = await fetch('http://localhost:8088/api/notes');
+export const fetchNotes = createAsyncThunk('/api/notes', async ({page, size}) => {
+    const response = await fetch(`http://localhost:8088/api/notes?page=${page}&size=${size}`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
