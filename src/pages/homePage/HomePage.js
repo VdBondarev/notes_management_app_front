@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react';
-import { fetchNotes, createNote, deleteNote, fetchNoteById } from "../../store/reducers/notes";
-import { useDispatch, useSelector } from "react-redux";
-import { selectReducerNotes } from "../../store/selectors/notes";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchNotes, createNote, deleteNote, fetchNoteById } from '../../store/reducers/notes';
+import { selectReducerNotes } from '../../store/selectors/notes';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root'); // Set the app root for accessibility
 
 export const HomePage = () => {
     const dispatch = useDispatch();
@@ -16,13 +19,11 @@ export const HomePage = () => {
 
     useEffect(() => {
         dispatch(fetchNotes({ page, size })).then((action) => {
-            const notes = action.payload.notes;
-            setIsLastPage(notes.length < size);
+            setIsLastPage(action.payload.notes.length < size);
         }).catch(error => {
             console.error("Error fetching notes:", error);
         });
     }, [dispatch, page, size]);
-
 
     const handlePreviousPage = () => {
         if (page > 0) {
@@ -38,14 +39,7 @@ export const HomePage = () => {
 
     const handleAddNote = () => {
         dispatch(createNote({ title, content })).then(() => {
-            // Reload the notes list without changing the current page
-            dispatch(fetchNotes({ page, size })).then((action) => {
-                const notes = action.payload.notes;
-                if (notes.length === size) {
-                    setIsLastPage(false);
-                }
-            })
-            window.location.reload();
+            dispatch(fetchNotes({ page, size }));
         }).catch(error => {
             console.error("Error creating note:", error);
         });
@@ -82,7 +76,7 @@ export const HomePage = () => {
                         {note.title}
                         <div>
                             <button className="btn edit">Edit</button>
-                            <button className="btn delete" onClick={() => handleDeleteNote(note.id)}>Delete</button>
+                            <button className="btn delete" onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}>Delete</button>
                         </div>
                     </li>
                 ))}
@@ -106,16 +100,30 @@ export const HomePage = () => {
                 </div>
                 <div>
                     <label htmlFor="content">Content:</label>
-                    <input
+                    <textarea
                         id="content"
                         className="input"
                         placeholder="Enter content"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                    />
+                    ></textarea>
                 </div>
                 <button className="btn add" onClick={handleAddNote}>Add a note</button>
             </div>
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Note Details"
+            >
+                {selectedNote && (
+                    <div>
+                        <h2>{selectedNote.title}</h2>
+                        <p>{selectedNote.content}</p>
+                        <p>Last Updated: {new Date(selectedNote.lastUpdatedAt).toLocaleDateString('en-GB')}</p>
+                        <button onClick={closeModal}>Close</button>
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 };
