@@ -4,8 +4,6 @@ import { fetchNotes, createNote, deleteNote, fetchNoteById } from '../../store/r
 import { selectReducerNotes } from '../../store/selectors/notes';
 import Modal from 'react-modal';
 
-Modal.setAppElement('#root'); // Set the app root for accessibility
-
 export const HomePage = () => {
     const dispatch = useDispatch();
     const [page, setPage] = useState(0);
@@ -38,16 +36,25 @@ export const HomePage = () => {
     };
 
     const handleAddNote = () => {
-        dispatch(createNote({ title, content })).then(() => {
-            dispatch(fetchNotes({ page, size }));
-        }).catch(error => {
-            console.error("Error creating note:", error);
-        });
+        if (title.trim() && content.trim()) {
+            dispatch(createNote({ title, content })).then(() => {
+                dispatch(fetchNotes({ page, size })).then((action) => {
+                    setIsLastPage(action.payload.notes.length !== size);
+                })
+                setTitle('');
+                setContent('');
+            }).catch(error => {
+                console.error("Error creating note:", error);
+            });
+        }
     };
 
     const handleDeleteNote = (id) => {
         dispatch(deleteNote(id)).then(() => {
-            window.location.reload(); // Reload the page after deleting the note
+            dispatch(fetchNotes({ page, size })).then((action) => {
+
+                setIsLastPage(action.payload.notes.length !== size);
+            })
         }).catch(error => {
             console.error("Error deleting note:", error);
         });
@@ -76,7 +83,11 @@ export const HomePage = () => {
                         {note.title}
                         <div>
                             <button className="btn edit">Edit</button>
-                            <button className="btn delete" onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}>Delete</button>
+                            <button className="btn delete" onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteNote(note.id);
+                            }}>Delete
+                            </button>
                         </div>
                     </li>
                 ))}
@@ -89,13 +100,14 @@ export const HomePage = () => {
             <div className="inpContainer">
                 <div>
                     <label htmlFor="title">Title:</label>
-                    <input
+                    <textarea
                         type="text"
                         id="title"
                         className="input"
-                        placeholder="Enter title"
+                        placeholder="Cannot be empty"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
+                        style={{ width: '200px', height: '200px', resize: 'none'}}
                     />
                 </div>
                 <div>
@@ -103,9 +115,10 @@ export const HomePage = () => {
                     <textarea
                         id="content"
                         className="input"
-                        placeholder="Enter content"
+                        placeholder="Cannot be empty"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
+                        style={{width: '200px', height: '200px', resize: 'none' }}
                     ></textarea>
                 </div>
                 <button className="btn add" onClick={handleAddNote}>Add a note</button>
@@ -114,16 +127,86 @@ export const HomePage = () => {
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Note Details"
+                className="note-modal"
+                overlayClassName="note-modal-overlay"
             >
                 {selectedNote && (
-                    <div>
-                        <h2>{selectedNote.title}</h2>
-                        <p>{selectedNote.content}</p>
-                        <p>Last Updated: {new Date(selectedNote.lastUpdatedAt).toLocaleDateString('en-GB')}</p>
+                    <div className="note-content">
+                        <h2 className="note-title">{selectedNote.title}</h2>
+                        <div className="note-text-container">
+                            <p className="note-text">{selectedNote.content}</p>
+                        </div>
+                        <p className="note-last-updated">
+                            Last updated: {new Date(selectedNote.lastUpdatedAt).toLocaleDateString('en-GB')}
+                        </p>
                         <button onClick={closeModal}>Close</button>
                     </div>
                 )}
             </Modal>
+            <style jsx>{`
+                .note-modal {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    right: auto;
+                    bottom: auto;
+                    transform: translate(-50%, -50%);
+                    width: 800px;
+                    height: 600px;
+                    background-color: white;
+                    padding: 20px;
+                    border-radius: 4px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    overflow: hidden;
+                }
+
+                .note-modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .note-content {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    overflow: hidden;
+                    height: 100%;
+                }
+
+                .note-title {
+                    text-align: center;
+                    font-size: 24px;
+                    margin-bottom: 20px;
+                }
+
+                .note-text-container {
+                    flex-grow: 1;
+                    overflow-y: auto;
+                }
+
+                .note-text {
+                    white-space: pre-wrap; /* Preserve whitespace and line breaks */
+                    word-wrap: break-word; /* Break long words */
+                    margin-bottom: 20px;
+                }
+
+                .note-last-updated {
+                    text-align: right;
+                    font-size: 12px;
+                    color: gray;
+                    margin-top: auto;
+                }
+            `}</style>
         </div>
     );
 };
