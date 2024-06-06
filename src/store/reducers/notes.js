@@ -23,6 +23,25 @@ export const createNote = createAsyncThunk('notes/create', async ({ title, conte
     return await response.json();
 });
 
+export const fetchNoteById = createAsyncThunk('notes/fetchNoteById', async (id) => {
+    const response = await fetch(`http://localhost:8088/api/notes/${id}`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    return data;
+});
+
+export const deleteNote = createAsyncThunk('notes/delete', async (id) => {
+    const response = await fetch(`http://localhost:8088/api/notes/${id}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete note');
+    }
+    return id;
+});
+
 export const notesSlice = createSlice({
     name: 'notes',
     initialState: {
@@ -55,6 +74,29 @@ export const notesSlice = createSlice({
                 state.totalCount++;
             })
             .addCase(createNote.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
+            .addCase(deleteNote.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(deleteNote.fulfilled, (state, action) => {
+                state.status = 'idle';
+                state.notes = state.notes.filter(note => note.id !== action.payload);
+                state.totalCount--;
+            })
+            .addCase(deleteNote.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
+            .addCase(fetchNoteById.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchNoteById.fulfilled, (state, action) => {
+                state.status = 'idle';
+                state.selectedNote = action.payload;
+            })
+            .addCase(fetchNoteById.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             });

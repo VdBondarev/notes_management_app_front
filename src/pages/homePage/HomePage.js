@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchNotes, createNote } from "../../store/reducers/notes";
+import { fetchNotes, createNote, deleteNote, fetchNoteById } from "../../store/reducers/notes";
 import { useDispatch, useSelector } from "react-redux";
 import { selectReducerNotes } from "../../store/selectors/notes";
 
@@ -11,6 +11,8 @@ export const HomePage = () => {
     const notes = useSelector(selectReducerNotes);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedNote, setSelectedNote] = useState(null);
 
     useEffect(() => {
         dispatch(fetchNotes({ page, size })).then((action) => {
@@ -43,22 +45,44 @@ export const HomePage = () => {
                     setIsLastPage(false);
                 }
             })
+            window.location.reload();
         }).catch(error => {
             console.error("Error creating note:", error);
         });
     };
 
+    const handleDeleteNote = (id) => {
+        dispatch(deleteNote(id)).then(() => {
+            window.location.reload(); // Reload the page after deleting the note
+        }).catch(error => {
+            console.error("Error deleting note:", error);
+        });
+    };
+
+    const handleNoteClick = (id) => {
+        dispatch(fetchNoteById(id)).then((action) => {
+            setSelectedNote(action.payload);
+            setModalIsOpen(true);
+        }).catch(error => {
+            console.error("Error fetching note:", error);
+        });
+    };
+
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setSelectedNote(null);
+    };
 
     return (
         <div>
             <h1>Notes</h1>
             <ul>
                 {notes.map(note => (
-                    <li key={note.id}>
+                    <li key={note.id} onClick={() => handleNoteClick(note.id)}>
                         {note.title}
                         <div>
                             <button className="btn edit">Edit</button>
-                            <button className="btn delete">Delete</button>
+                            <button className="btn delete" onClick={() => handleDeleteNote(note.id)}>Delete</button>
                         </div>
                     </li>
                 ))}
