@@ -107,7 +107,7 @@ export const HomePage = () => {
                         placeholder="Cannot be empty"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        style={{ width: '200px', height: '200px', resize: 'none'}}
+                        style={{ width: '200px', height: '150px', resize: 'none'}}
                     />
                 </div>
                 <div>
@@ -118,10 +118,12 @@ export const HomePage = () => {
                         placeholder="Cannot be empty"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        style={{width: '200px', height: '200px', resize: 'none' }}
+                        style={{width: '200px', height: '150px', resize: 'none' }}
                     ></textarea>
                 </div>
-                <button className="btn add" onClick={handleAddNote}>Add a note</button>
+                <button className="btn add" onClick={handleAddNote} style={{height: '80px', fontSize: '15px'}}>
+                    Add a note
+                </button>
             </div>
             <Modal
                 isOpen={modalIsOpen}
