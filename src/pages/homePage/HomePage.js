@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchNotes, createNote, deleteNote, fetchNoteById } from '../../store/reducers/notes';
+import { fetchNotes, createNote, deleteNote, fetchNoteById, updateNote } from '../../store/reducers/notes';
 import { selectReducerNotes } from '../../store/selectors/notes';
 import Modal from 'react-modal';
 
@@ -12,8 +12,11 @@ export const HomePage = () => {
     const notes = useSelector(selectReducerNotes);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [editModalIsOpen, setEditModalIsOpen] = useState(false);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedNote, setSelectedNote] = useState(null);
+    const [editTitle, setEditTitle] = useState('');
+    const [editContent, setEditContent] = useState('');
 
     useEffect(() => {
         dispatch(fetchNotes({ page, size })).then((action) => {
@@ -74,6 +77,37 @@ export const HomePage = () => {
         setSelectedNote(null);
     };
 
+    const handleEditNote = (id) => {
+        dispatch(fetchNoteById(id)).then((action) => {
+            setSelectedNote(action.payload);
+            setEditTitle(action.payload.title);
+            setEditContent(action.payload.content);
+            setEditModalIsOpen(true);
+        }).catch(error => {
+            console.error("Error fetching note:", error);
+        });
+    };
+
+    const handleUpdateNote = () => {
+        if (editTitle.trim() && editContent.trim()) {
+            dispatch(updateNote({
+                id: selectedNote.id,
+                note: { title: editTitle, content: editContent }
+            })).then(() => {
+                setEditModalIsOpen(false);
+                setSelectedNote(null);
+                dispatch(fetchNotes({ page, size }));
+            }).catch(error => {
+                console.error("Error updating note:", error);
+            });
+        }
+    };
+
+    const closeEditModal = () => {
+        setEditModalIsOpen(false);
+        setSelectedNote(null);
+    };
+
     return (
         <div>
             <h1>Notes</h1>
@@ -82,7 +116,10 @@ export const HomePage = () => {
                     <li key={note.id} onClick={() => handleNoteClick(note.id)}>
                         {note.title}
                         <div>
-                            <button className="btn edit">Edit</button>
+                            <button className="btn edit" onClick={(e) => {
+                                e.stopPropagation(); handleEditNote(note.id)
+                            }}>Edit
+                            </button>
                             <button className="btn delete" onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteNote(note.id);
@@ -142,6 +179,41 @@ export const HomePage = () => {
                             Last updated: {new Date(selectedNote.lastUpdatedAt).toLocaleDateString('en-GB')}
                         </p>
                         <button onClick={closeModal}>Close</button>
+                    </div>
+                )}
+            </Modal>
+            <Modal
+                isOpen={editModalIsOpen}
+                onRequestClose={closeEditModal}
+                contentLabel="Edit Note Modal"
+                className="note-modal"
+                overlayClassName="note-modal-overlay"
+            >
+                {selectedNote && (
+                    <div className="note-content">
+                        <h2 className="note-title">Edit the note</h2>
+                        <div className="note-text-container">
+                            <label htmlFor="editTitle">Title:</label>
+                            <textarea
+                                id="editTitle"
+                                placeholder="Cannot be empty"
+                                className="input"
+                                value={editTitle}
+                                onChange={(e) => setEditTitle(e.target.value)}
+                                style={{ width: '750px', height: '150px', resize: 'none'}}
+                            />
+                            <label htmlFor="editContent">Content:</label>
+                            <textarea
+                                id="editContent"
+                                placeholder="Cannot be empty"
+                                className="input"
+                                value={editContent}
+                                onChange={(e) => setEditContent(e.target.value)}
+                                style={{ width: '750px', height: '230px', resize: 'none'}}
+                            ></textarea>
+                        </div>
+                        <button onClick={handleUpdateNote}>Update</button>
+                        <button onClick={closeEditModal}>Close</button>
                     </div>
                 )}
             </Modal>

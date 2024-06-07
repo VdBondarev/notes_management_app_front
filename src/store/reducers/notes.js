@@ -42,6 +42,20 @@ export const deleteNote = createAsyncThunk('notes/delete', async (id) => {
     return id;
 });
 
+export const updateNote = createAsyncThunk('notes/updateNote', async ({ id, note }) => {
+    const response = await fetch(`http://localhost:8088/api/notes/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(note)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update note');
+    }
+    return await response.json();
+});
+
 export const notesSlice = createSlice({
     name: 'notes',
     initialState: {
@@ -97,6 +111,20 @@ export const notesSlice = createSlice({
                 state.selectedNote = action.payload;
             })
             .addCase(fetchNoteById.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
+            .addCase(updateNote.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(updateNote.fulfilled, (state, action) => {
+                state.status = 'idle';
+                state.notes = state.notes.map(note => note.id === action.payload.id ? action.payload : note);
+                if (state.selectedNote && state.selectedNote.id === action.payload.id) {
+                    state.selectedNote = action.payload;
+                }
+            })
+            .addCase(updateNote.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             });
