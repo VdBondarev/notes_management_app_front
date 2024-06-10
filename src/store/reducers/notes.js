@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const API_URL = "http://localhost:8088/api";
+const lastUpdatedAtFieldName = "lastUpdatedAt"
 
 export const fetchNotes = createAsyncThunk('notes/fetchNotes', async ({ page, size }) => {
-    const response = await fetch(API_URL + `/notes?page=${page}&size=${size}`);
+    const sortingByLastUpdatedAt = `sort=${lastUpdatedAtFieldName},DESC`;
+    const response = await fetch(API_URL + `/notes?page=${page}&size=${size}&${sortingByLastUpdatedAt}`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -71,6 +73,7 @@ export const searchNotes = createAsyncThunk('notes/search', async ({ title, cont
     if (size !== undefined) {
         query.append('size', size);
     }
+    query.append('sort', `${lastUpdatedAtFieldName},DESC`);
     const response = await fetch(API_URL + `/notes/search?${query.toString()}`);
     if (!response.ok) {
         throw new Error('Network response was not ok');

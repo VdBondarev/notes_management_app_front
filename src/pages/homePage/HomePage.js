@@ -148,7 +148,11 @@ export const HomePage = () => {
                         className="input"
                         placeholder="Title"
                         value={searchTitle}
-                        onChange={(e) => setSearchTitle(e.target.value)}
+                        onChange={(e) => {
+                            setSearchTitle(e.target.value);
+                            setPage(0);
+                        }
+                        }
                         style={{width: '150px', height: '30px', resize: 'none'}}
                     />
                 </div>
@@ -159,7 +163,11 @@ export const HomePage = () => {
                         className="input"
                         placeholder="Content"
                         value={searchContent}
-                        onChange={(e) => setSearchContent(e.target.value)}
+                        onChange={(e) => {
+                            setSearchContent(e.target.value);
+                            setPage(0);
+                        }
+                        }
                         style={{width: '150px', height: '30px', resize: 'none'}}
                     />
                 </div>
