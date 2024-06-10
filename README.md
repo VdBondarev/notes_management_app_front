@@ -2,6 +2,8 @@
 
 # The Frontend of Notes Management Application README
 
+### [Backend is here.](https://github.com/VdBondarev/notes_management_app_backend)
+
 ## [See the detailed video-explanation on starting and using both backend and frontend applications by following this link.](https://www.loom.com/share/7ec76ef8a02144bb93836066957f34ce?sid=b76b5c6e-363f-4e58-9848-03c076361ea4)
 
 ## Main technologies used
