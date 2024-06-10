@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchNotes, createNote, deleteNote, fetchNoteById, updateNote } from '../../store/reducers/notes';
+import {fetchNotes, createNote, deleteNote, fetchNoteById, updateNote, searchNotes} from '../../store/reducers/notes';
 import { selectReducerNotes } from '../../store/selectors/notes';
 import Modal from 'react-modal';
+import "./style/homePage.css";
 
 export const HomePage = () => {
     const dispatch = useDispatch();
@@ -17,14 +18,28 @@ export const HomePage = () => {
     const [selectedNote, setSelectedNote] = useState(null);
     const [editTitle, setEditTitle] = useState('');
     const [editContent, setEditContent] = useState('');
+    const maxTitleLengthBeforeTruncating = 15;
+    const maxTitleLength = 50;
+    const maxContentLength = 20000;
+    const [searchTitle, setSearchTitle] = useState('');
+    const [searchContent, setSearchContent] = useState('');
+    const [initialRender, setInitialRender] = useState(true);
 
     useEffect(() => {
-        dispatch(fetchNotes({ page, size })).then((action) => {
+        if (initialRender) {
+            setInitialRender(false);
+            return;
+        }
+        const action = searchTitle.trim() || searchContent.trim()
+            ? searchNotes({ title: searchTitle, content: searchContent, page, size })
+            : fetchNotes({ page, size });
+
+        dispatch(action).then((action) => {
             setIsLastPage(action.payload.notes.length < size);
         }).catch(error => {
             console.error("Error fetching notes:", error);
         });
-    }, [dispatch, page, size]);
+    }, [dispatch, searchTitle, searchContent, page, size, initialRender]);
 
     const handlePreviousPage = () => {
         if (page > 0) {
@@ -36,12 +51,17 @@ export const HomePage = () => {
         if (!isLastPage) {
             setPage(page + 1);
         }
-    };
+    }
 
     const handleAddNote = () => {
-        if (title.trim() && content.trim()) {
-            dispatch(createNote({ title, content })).then(() => {
-                dispatch(fetchNotes({ page, size })).then((action) => {
+        if (title.trim()
+            && content.trim()
+            && title.length <= maxTitleLength
+            && content.length < maxContentLength
+        ) {
+            const action = createNote( {title: title, content: content });
+            dispatch(action).then(() => {
+                dispatch(fetchNotes({page, size})).then((action) => {
                     setIsLastPage(action.payload.notes.length !== size);
                 })
                 setTitle('');
@@ -54,8 +74,7 @@ export const HomePage = () => {
 
     const handleDeleteNote = (id) => {
         dispatch(deleteNote(id)).then(() => {
-            dispatch(fetchNotes({ page, size })).then((action) => {
-
+            dispatch(fetchNotes({page, size})).then((action) => {
                 setIsLastPage(action.payload.notes.length !== size);
             })
         }).catch(error => {
@@ -89,14 +108,17 @@ export const HomePage = () => {
     };
 
     const handleUpdateNote = () => {
-        if (editTitle.trim() && editContent.trim()) {
+        if (editTitle.trim() && editContent.trim()
+            && editTitle.length <= maxTitleLength
+            && editContent.length <= maxContentLength
+        ) {
             dispatch(updateNote({
                 id: selectedNote.id,
-                note: { title: editTitle, content: editContent }
+                note: {title: editTitle, content: editContent}
             })).then(() => {
                 setEditModalIsOpen(false);
                 setSelectedNote(null);
-                dispatch(fetchNotes({ page, size }));
+                dispatch(fetchNotes({page, size}));
             }).catch(error => {
                 console.error("Error updating note:", error);
             });
@@ -108,16 +130,48 @@ export const HomePage = () => {
         setSelectedNote(null);
     };
 
+    const truncateTitle = (title) => {
+        if (title.length <= maxTitleLengthBeforeTruncating) {
+            return title;
+        }
+        return `${title.slice(0, maxTitleLengthBeforeTruncating)}...`;
+    };
+
     return (
         <div>
             <h1>Notes</h1>
+            <div className="search-container">
+                <div>
+                    <label htmlFor="searchTitle">Title:</label>
+                    <textarea
+                        id="searchTitle"
+                        className="input"
+                        placeholder="Title"
+                        value={searchTitle}
+                        onChange={(e) => setSearchTitle(e.target.value)}
+                        style={{width: '150px', height: '30px', resize: 'none'}}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="searchContent">Content:</label>
+                    <textarea
+                        id="searchContent"
+                        className="input"
+                        placeholder="Content"
+                        value={searchContent}
+                        onChange={(e) => setSearchContent(e.target.value)}
+                        style={{width: '150px', height: '30px', resize: 'none'}}
+                    />
+                </div>
+            </div>
             <ul>
                 {notes.map(note => (
                     <li key={note.id} onClick={() => handleNoteClick(note.id)}>
-                        {note.title}
+                        {truncateTitle(note.title)}
                         <div>
                             <button className="btn edit" onClick={(e) => {
-                                e.stopPropagation(); handleEditNote(note.id)
+                                e.stopPropagation();
+                                handleEditNote(note.id)
                             }}>Edit
                             </button>
                             <button className="btn delete" onClick={(e) => {
@@ -138,13 +192,12 @@ export const HomePage = () => {
                 <div>
                     <label htmlFor="title">Title:</label>
                     <textarea
-                        type="text"
                         id="title"
                         className="input"
-                        placeholder="Cannot be empty"
+                        placeholder={`Cannot be empty.\nMaximal length is ${maxTitleLength} symbols`}
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        style={{ width: '200px', height: '150px', resize: 'none'}}
+                        style={{width: '200px', height: '150px', resize: 'none'}}
                     />
                 </div>
                 <div>
@@ -152,10 +205,10 @@ export const HomePage = () => {
                     <textarea
                         id="content"
                         className="input"
-                        placeholder="Cannot be empty"
+                        placeholder={`Cannot be empty.\nMaximal length is ${maxContentLength} symbols`}
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        style={{width: '200px', height: '150px', resize: 'none' }}
+                        style={{width: '200px', height: '150px', resize: 'none'}}
                     ></textarea>
                 </div>
                 <button className="btn add" onClick={handleAddNote} style={{height: '80px', fontSize: '15px'}}>
@@ -175,9 +228,18 @@ export const HomePage = () => {
                         <div className="note-text-container">
                             <p className="note-text">{selectedNote.content}</p>
                         </div>
-                        <p className="note-last-updated">
-                            Last updated: {new Date(selectedNote.lastUpdatedAt).toLocaleDateString('en-GB')}
-                        </p>
+                        <div className="note-meta">
+                            <p className="note-time-displaying">
+                                Created: {new Date(selectedNote.createdAt).toLocaleString('en-GB', {dateStyle: 'medium',
+                                timeStyle: 'medium'
+                                })}
+                            </p>
+                            <p className="note-time-displaying">
+                                Last updated: {new Date(selectedNote.lastUpdatedAt).toLocaleString('en-GB', {dateStyle: 'medium',
+                                timeStyle: 'medium'
+                                })}
+                            </p>
+                        </div>
                         <button onClick={closeModal}>Close</button>
                     </div>
                 )}
@@ -196,20 +258,20 @@ export const HomePage = () => {
                             <label htmlFor="editTitle">Title:</label>
                             <textarea
                                 id="editTitle"
-                                placeholder="Cannot be empty"
+                                placeholder={`Cannot be empty. Maximal length is ${maxTitleLength} symbols`}
                                 className="input"
                                 value={editTitle}
                                 onChange={(e) => setEditTitle(e.target.value)}
-                                style={{ width: '750px', height: '150px', resize: 'none'}}
+                                style={{width: '750px', height: '150px', resize: 'none'}}
                             />
                             <label htmlFor="editContent">Content:</label>
                             <textarea
                                 id="editContent"
-                                placeholder="Cannot be empty"
+                                placeholder={`Cannot be empty. Maximal length is ${maxContentLength} symbols`}
                                 className="input"
                                 value={editContent}
                                 onChange={(e) => setEditContent(e.target.value)}
-                                style={{ width: '750px', height: '230px', resize: 'none'}}
+                                style={{width: '750px', height: '230px', resize: 'none'}}
                             ></textarea>
                         </div>
                         <button onClick={handleUpdateNote}>Update</button>
@@ -217,70 +279,6 @@ export const HomePage = () => {
                     </div>
                 )}
             </Modal>
-            <style jsx>{`
-                .note-modal {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    right: auto;
-                    bottom: auto;
-                    transform: translate(-50%, -50%);
-                    width: 800px;
-                    height: 600px;
-                    background-color: white;
-                    padding: 20px;
-                    border-radius: 4px;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                    overflow: hidden;
-                }
-
-                .note-modal-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .note-content {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                    overflow: hidden;
-                    height: 100%;
-                }
-
-                .note-title {
-                    text-align: center;
-                    font-size: 24px;
-                    margin-bottom: 20px;
-                }
-
-                .note-text-container {
-                    flex-grow: 1;
-                    overflow-y: auto;
-                }
-
-                .note-text {
-                    white-space: pre-wrap; /* Preserve whitespace and line breaks */
-                    word-wrap: break-word; /* Break long words */
-                    margin-bottom: 20px;
-                }
-
-                .note-last-updated {
-                    text-align: right;
-                    font-size: 12px;
-                    color: gray;
-                    margin-top: auto;
-                }
-            `}</style>
         </div>
     );
 };

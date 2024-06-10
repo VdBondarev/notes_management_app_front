@@ -1,7 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+const API_URL = "http://localhost:8088/api";
+
 export const fetchNotes = createAsyncThunk('notes/fetchNotes', async ({ page, size }) => {
-    const response = await fetch(`http://localhost:8088/api/notes?page=${page}&size=${size}`);
+    const response = await fetch(API_URL + `/notes?page=${page}&size=${size}`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -10,7 +12,7 @@ export const fetchNotes = createAsyncThunk('notes/fetchNotes', async ({ page, si
 });
 
 export const createNote = createAsyncThunk('notes/create', async ({ title, content }) => {
-    const response = await fetch('http://localhost:8088/api/notes', {
+    const response = await fetch(API_URL + '/notes', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -24,16 +26,15 @@ export const createNote = createAsyncThunk('notes/create', async ({ title, conte
 });
 
 export const fetchNoteById = createAsyncThunk('notes/fetchNoteById', async (id) => {
-    const response = await fetch(`http://localhost:8088/api/notes/${id}`);
+    const response = await fetch(API_URL + `/notes/${id}`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
-    const data = await response.json();
-    return data;
+    return await response.json();
 });
 
 export const deleteNote = createAsyncThunk('notes/delete', async (id) => {
-    const response = await fetch(`http://localhost:8088/api/notes/${id}`, {
+    const response = await fetch(API_URL + `/notes/${id}`, {
         method: 'DELETE',
     });
     if (!response.ok) {
@@ -43,7 +44,7 @@ export const deleteNote = createAsyncThunk('notes/delete', async (id) => {
 });
 
 export const updateNote = createAsyncThunk('notes/updateNote', async ({ id, note }) => {
-    const response = await fetch(`http://localhost:8088/api/notes/${id}`, {
+    const response = await fetch(API_URL + `/notes/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -54,6 +55,28 @@ export const updateNote = createAsyncThunk('notes/updateNote', async ({ id, note
         throw new Error('Failed to update note');
     }
     return await response.json();
+});
+
+export const searchNotes = createAsyncThunk('notes/search', async ({ title, content, page, size }) => {
+    const query = new URLSearchParams();
+    if (title) {
+        query.append('title', title);
+    }
+    if (content) {
+        query.append('content', content);
+    }
+    if (page !== undefined) {
+        query.append('page', page);
+    }
+    if (size !== undefined) {
+        query.append('size', size);
+    }
+    const response = await fetch(API_URL + `/notes/search?${query.toString()}`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    return { notes: data, page, size };
 });
 
 export const notesSlice = createSlice({
@@ -127,6 +150,17 @@ export const notesSlice = createSlice({
             .addCase(updateNote.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
+            })
+            .addCase(searchNotes.pending, (state) => {
+                state.searchStatus = 'loading';
+            })
+            .addCase(searchNotes.fulfilled, (state, action) => {
+                state.status = 'idle';
+                state.notes = action.payload.notes;
+            })
+            .addCase(searchNotes.rejected, (state, action) => {
+                state.searchStatus = 'failed';
+                state.searchError = action.error.message;
             });
     },
 });

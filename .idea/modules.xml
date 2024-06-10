@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/test-task.iml" filepath="$PROJECT_DIR$/.idea/test-task.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/notes_management_app_front.iml" filepath="$PROJECT_DIR$/.idea/notes_management_app_front.iml" />
     </modules>
   </component>
 </project>
