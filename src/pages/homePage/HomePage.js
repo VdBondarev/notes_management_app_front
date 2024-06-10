@@ -61,9 +61,12 @@ export const HomePage = () => {
         ) {
             const action = createNote( {title: title, content: content });
             dispatch(action).then(() => {
-                dispatch(fetchNotes({page, size})).then((action) => {
+                setPage(0);
+                dispatch(fetchNotes({ page: page, size: size})).then((action) => {
                     setIsLastPage(action.payload.notes.length !== size);
                 })
+                setSearchTitle('');
+                setSearchContent('');
                 setTitle('');
                 setContent('');
             }).catch(error => {
