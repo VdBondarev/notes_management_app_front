@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {fetchNotes, createNote, deleteNote, fetchNoteById, updateNote, searchNotes} from '../../store/reducers/notes';
+import {fetchNotes, createNote, deleteNoteById, fetchNoteById, updateNoteById, searchNotes} from '../../store/reducers/notes';
 import { selectReducerNotes } from '../../store/selectors/notes';
 import Modal from 'react-modal';
 import "./style/homePage.css";
@@ -33,7 +33,6 @@ export const HomePage = () => {
         const action = searchTitle.trim() || searchContent.trim()
             ? searchNotes({ title: searchTitle, content: searchContent, page, size })
             : fetchNotes({ page, size });
-
         dispatch(action).then((action) => {
             setIsLastPage(action.payload.notes.length < size);
         }).catch(error => {
@@ -54,15 +53,14 @@ export const HomePage = () => {
     }
 
     const handleAddNote = () => {
-        if (title.trim()
-            && content.trim()
-            && title.length <= maxTitleLength
-            && content.length < maxContentLength
+        if (title.trim() && content.trim()
+            && title.length <= maxTitleLength && content.length < maxContentLength
         ) {
-            const action = createNote( {title: title, content: content });
+            const action =
+                createNote( {title: title, content: content });
             dispatch(action).then(() => {
                 setPage(0);
-                dispatch(fetchNotes({ page: page, size: size})).then((action) => {
+                dispatch(fetchNotes({ page: page, size: size })).then((action) => {
                     setIsLastPage(action.payload.notes.length !== size);
                 })
                 setSearchTitle('');
@@ -76,9 +74,12 @@ export const HomePage = () => {
     };
 
     const handleDeleteNote = (id) => {
-        dispatch(deleteNote(id)).then(() => {
-            dispatch(fetchNotes({page, size})).then((action) => {
+        dispatch(deleteNoteById(id)).then(() => {
+            setPage(0);
+            dispatch(fetchNotes({ page: page, size: size })).then((action) => {
                 setIsLastPage(action.payload.notes.length !== size);
+                setSearchTitle('');
+                setSearchContent('');
             })
         }).catch(error => {
             console.error("Error deleting note:", error);
@@ -106,7 +107,7 @@ export const HomePage = () => {
             setEditContent(action.payload.content);
             setEditModalIsOpen(true);
         }).catch(error => {
-            console.error("Error fetching note:", error);
+            console.error("Error fetching a note:", error);
         });
     };
 
@@ -115,15 +116,22 @@ export const HomePage = () => {
             && editTitle.length <= maxTitleLength
             && editContent.length <= maxContentLength
         ) {
-            dispatch(updateNote({
+            dispatch(updateNoteById({
                 id: selectedNote.id,
-                note: {title: editTitle, content: editContent}
+                note: { title: editTitle, content: editContent }
             })).then(() => {
                 setEditModalIsOpen(false);
                 setSelectedNote(null);
-                dispatch(fetchNotes({page, size}));
+                setPage(0);
+                dispatch(fetchNotes({ page: page, size: size })).then((action) => {
+                    setIsLastPage(action.payload.notes.length !== size);
+                    setSearchTitle('');
+                    setSearchContent('');
+                }).catch(error => {
+                    console.log("Error fetching notes", error);
+                });
             }).catch(error => {
-                console.error("Error updating note:", error);
+                console.error("Error updating a note:", error);
             });
         }
     };

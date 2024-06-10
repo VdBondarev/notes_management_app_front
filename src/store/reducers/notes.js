@@ -3,7 +3,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 const API_URL = "http://localhost:8088/api";
 const lastUpdatedAtFieldName = "lastUpdatedAt"
 
-export const fetchNotes = createAsyncThunk('notes/fetchNotes', async ({ page, size }) => {
+export const fetchNotes = createAsyncThunk(
+    'notes/fetchNotes', async ({ page, size }) => {
     const sortingByLastUpdatedAt = `sort=${lastUpdatedAtFieldName},DESC`;
     const response = await fetch(API_URL + `/notes?page=${page}&size=${size}&${sortingByLastUpdatedAt}`);
     if (!response.ok) {
@@ -13,7 +14,8 @@ export const fetchNotes = createAsyncThunk('notes/fetchNotes', async ({ page, si
     return { notes: data, page, size };
 });
 
-export const createNote = createAsyncThunk('notes/create', async ({ title, content }) => {
+export const createNote = createAsyncThunk(
+    'notes/create', async ({ title, content }) => {
     const response = await fetch(API_URL + '/notes', {
         method: 'POST',
         headers: {
@@ -27,7 +29,8 @@ export const createNote = createAsyncThunk('notes/create', async ({ title, conte
     return await response.json();
 });
 
-export const fetchNoteById = createAsyncThunk('notes/fetchNoteById', async (id) => {
+export const fetchNoteById = createAsyncThunk(
+    'notes/fetchNoteById', async (id) => {
     const response = await fetch(API_URL + `/notes/${id}`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -35,7 +38,8 @@ export const fetchNoteById = createAsyncThunk('notes/fetchNoteById', async (id) 
     return await response.json();
 });
 
-export const deleteNote = createAsyncThunk('notes/delete', async (id) => {
+export const deleteNoteById = createAsyncThunk(
+    'notes/delete', async (id) => {
     const response = await fetch(API_URL + `/notes/${id}`, {
         method: 'DELETE',
     });
@@ -45,7 +49,8 @@ export const deleteNote = createAsyncThunk('notes/delete', async (id) => {
     return id;
 });
 
-export const updateNote = createAsyncThunk('notes/updateNote', async ({ id, note }) => {
+export const updateNoteById = createAsyncThunk(
+    'notes/updateNote', async ({ id, note }) => {
     const response = await fetch(API_URL + `/notes/${id}`, {
         method: 'PUT',
         headers: {
@@ -59,7 +64,8 @@ export const updateNote = createAsyncThunk('notes/updateNote', async ({ id, note
     return await response.json();
 });
 
-export const searchNotes = createAsyncThunk('notes/search', async ({ title, content, page, size }) => {
+export const searchNotes = createAsyncThunk(
+    'notes/search', async ({ title, content, page, size }) => {
     const query = new URLSearchParams();
     if (title) {
         query.append('title', title);
@@ -117,15 +123,15 @@ export const notesSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.error.message;
             })
-            .addCase(deleteNote.pending, (state) => {
+            .addCase(deleteNoteById.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(deleteNote.fulfilled, (state, action) => {
+            .addCase(deleteNoteById.fulfilled, (state, action) => {
                 state.status = 'idle';
                 state.notes = state.notes.filter(note => note.id !== action.payload);
                 state.totalCount--;
             })
-            .addCase(deleteNote.rejected, (state, action) => {
+            .addCase(deleteNoteById.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             })
@@ -140,17 +146,17 @@ export const notesSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.error.message;
             })
-            .addCase(updateNote.pending, (state) => {
+            .addCase(updateNoteById.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(updateNote.fulfilled, (state, action) => {
+            .addCase(updateNoteById.fulfilled, (state, action) => {
                 state.status = 'idle';
                 state.notes = state.notes.map(note => note.id === action.payload.id ? action.payload : note);
                 if (state.selectedNote && state.selectedNote.id === action.payload.id) {
                     state.selectedNote = action.payload;
                 }
             })
-            .addCase(updateNote.rejected, (state, action) => {
+            .addCase(updateNoteById.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             })
