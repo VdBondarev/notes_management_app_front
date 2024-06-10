@@ -70,4 +70,37 @@ describe('Home page', () => {
             cy.get('.delete').click();
         });
     });
+
+    it('should edit a previously added note', () => {
+        const testNoteTitle = 'TEST TITLE';
+        const testNoteContent = 'TEST CONTENT';
+        const updatedTestNoteTitle = 'UPDATED TITLE';
+        const updatedNoteContent = 'UPDATED CONTENT';
+
+        // Add a new note to ensure it exists for editing
+        cy.get('#title').type(testNoteTitle);
+        cy.get('#content').type(testNoteContent);
+        cy.get('.add').click();
+        cy.contains(testNoteTitle).should('exist');
+
+        // Click on the edit button for the note
+        cy.contains(testNoteTitle).first().within(() => {
+            cy.get('.edit').click();
+        })
+
+        // Edit the note title and content
+        cy.get('#editTitle').clear().type(updatedTestNoteTitle);
+        cy.get('#editContent').clear().type(updatedNoteContent);
+
+        // Save the updated note
+        cy.contains('Update').click();
+
+        // Verify that the updated note is displayed
+        cy.contains(updatedTestNoteTitle).should('exist');
+
+        // delete the note
+        cy.contains(updatedTestNoteTitle).within(() => {
+            cy.get('.delete').click();
+        })
+    });
 });
