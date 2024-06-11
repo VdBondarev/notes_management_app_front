@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNotes, createNote, deleteNoteById, fetchNoteById, updateNoteById, searchNotes } from '../../store/reducers/notes';
 import { selectReducerNotes } from '../../store/selectors/notes';
@@ -11,8 +11,8 @@ import { NoteEditModal } from "../components/modal/NoteEditModal";
 export const HomePage = () => {
     const dispatch = useDispatch();
     const [page, setPage] = useState(0);
-    const size = 6;
     const [isLastPage, setIsLastPage] = useState(false);
+    const size = 6;
     const notes = useSelector(selectReducerNotes);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -42,19 +42,19 @@ export const HomePage = () => {
         });
     }, [dispatch, searchTitle, searchContent, page, size, initialRender]);
 
-    const handlePreviousPage = () => {
+    const handlePreviousPage = useCallback(() => {
         if (page > 0) {
             setPage(page - 1);
         }
-    };
+    }, [page])
 
-    const handleNextPage = () => {
+    const handleNextPage = useCallback(() => {
         if (!isLastPage) {
             setPage(page + 1);
         }
-    }
+    }, [page, isLastPage])
 
-    const handleAddNote = () => {
+    const handleAddNote = useCallback(() => {
         if (title.trim() && content.trim()
             && title.length <= maxTitleLength && content.length < maxContentLength
         ) {
@@ -73,9 +73,9 @@ export const HomePage = () => {
                 console.error("Error creating note:", error);
             });
         }
-    };
+    }, [content, dispatch, page, title]);
 
-    const handleDeleteNote = (id) => {
+    const handleDeleteNote = useCallback((id) => {
         dispatch(deleteNoteById(id)).then(() => {
             setPage(0);
             dispatch(fetchNotes({ page: page, size: size })).then((action) => {
@@ -86,23 +86,23 @@ export const HomePage = () => {
         }).catch(error => {
             console.error("Error deleting note:", error);
         });
-    };
+    },[dispatch, page])
 
-    const handleNoteClick = (id) => {
+    const handleNoteClick = useCallback((id) => {
         dispatch(fetchNoteById(id)).then((action) => {
             setSelectedNote(action.payload);
             setModalIsOpen(true);
         }).catch(error => {
             console.error("Error fetching note:", error);
         });
-    };
+    }, [dispatch])
 
-    const closeModal = () => {
+    const closeModal = useCallback(() => {
         setModalIsOpen(false);
         setSelectedNote(null);
-    };
+    }, []);
 
-    const handleEditNote = (id) => {
+    const handleEditNote = useCallback((id) => {
         dispatch(fetchNoteById(id)).then((action) => {
             setSelectedNote(action.payload);
             setEditTitle(action.payload.title);
@@ -111,9 +111,9 @@ export const HomePage = () => {
         }).catch(error => {
             console.error("Error fetching a note:", error);
         });
-    };
+    }, [dispatch])
 
-    const handleUpdateNote = () => {
+    const handleUpdateNote = useCallback(() => {
         if (editTitle.trim() && editContent.trim()
             && editTitle.length <= maxTitleLength
             && editContent.length <= maxContentLength
@@ -136,12 +136,12 @@ export const HomePage = () => {
                 console.error("Error updating a note:", error);
             });
         }
-    };
+    }, [editContent, dispatch, editTitle, page, selectedNote])
 
-    const closeEditModal = () => {
+    const closeEditModal = useCallback(() => {
         setEditModalIsOpen(false);
         setSelectedNote(null);
-    };
+    }, []);
 
     return (
         <div>
