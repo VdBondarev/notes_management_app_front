@@ -75,36 +75,6 @@ li {
   }
 }
 
-.btn {
-  display: inline-block;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  margin-right: 5px;
-
-  &.edit {
-    background-color: $primary-color;
-    color: $secondary-color;
-  }
-
-  &.delete {
-    background-color: $delete-color;
-    color: $secondary-color;
-  }
-
-  &.add {
-    background-color: $add-color;
-    color: $secondary-color;
-  }
-
-
-  &:hover {
-    filter: brightness(90%);
-  }
-}
-
 .inpContainer {
   margin-top: 20px;
   min-width: 500px;

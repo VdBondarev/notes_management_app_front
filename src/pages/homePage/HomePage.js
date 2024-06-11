@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {fetchNotes, createNote, deleteNoteById, fetchNoteById, updateNoteById, searchNotes} from '../../store/reducers/notes';
 import { selectReducerNotes } from '../../store/selectors/notes';
 import Modal from 'react-modal';
-import "./style/homePage.css";
+import "./style/homePage.scss";
+import { ListItem } from "../components/ListItem";
 
 export const HomePage = () => {
     const dispatch = useDispatch();
@@ -185,21 +186,13 @@ export const HomePage = () => {
             </div>
             <ul>
                 {notes.map(note => (
-                    <li key={note.id} onClick={() => handleNoteClick(note.id)}>
-                        {truncateTitle(note.title)}
-                        <div>
-                            <button className="btn edit" onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditNote(note.id)
-                            }}>Edit
-                            </button>
-                            <button className="btn delete" onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteNote(note.id);
-                            }}>Delete
-                            </button>
-                        </div>
-                    </li>
+                    <ListItem
+                        note={note}
+                        handleNoteClick={handleNoteClick}
+                        handleEditNote={handleEditNote}
+                        handleDeleteNote={handleDeleteNote}
+                        truncateTitle={truncateTitle}
+                    />
                 ))}
             </ul>
             <div className="pagination">
@@ -249,14 +242,16 @@ export const HomePage = () => {
                         </div>
                         <div className="note-meta">
                             <p className="note-time-displaying">
-                                Created: {new Date(selectedNote.createdAt).toLocaleString('en-GB', {dateStyle: 'medium',
+                                Created: {new Date(selectedNote.createdAt).toLocaleString('en-GB', {
+                                dateStyle: 'medium',
                                 timeStyle: 'medium'
-                                })}
+                            })}
                             </p>
                             <p className="note-time-displaying">
-                                Last updated: {new Date(selectedNote.lastUpdatedAt).toLocaleString('en-GB', {dateStyle: 'medium',
+                                Last updated: {new Date(selectedNote.lastUpdatedAt).toLocaleString('en-GB', {
+                                dateStyle: 'medium',
                                 timeStyle: 'medium'
-                                })}
+                            })}
                             </p>
                         </div>
                         <button onClick={closeModal}>Close</button>
