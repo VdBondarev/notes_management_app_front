@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {fetchNotes, createNote, deleteNoteById, fetchNoteById, updateNoteById, searchNotes} from '../../store/reducers/notes';
 import { selectReducerNotes } from '../../store/selectors/notes';
-import Modal from 'react-modal';
 import { ListItem } from "../components/listItem/ListItem";
 import { SearchContainer } from "../components/searchContainer/SearchContainer";
 import { InpContainer } from "../components/inpContainer/InpContainer";
 import { NoteClickModal } from "../components/modal/NoteClickModal";
+import { NoteEditModal } from "../components/modal/NoteEditModal";
 
 export const HomePage = () => {
     const dispatch = useDispatch();
@@ -191,41 +191,18 @@ export const HomePage = () => {
                 selectedNote={selectedNote}
                 modalIsOpen={modalIsOpen}
             />
-            <Modal
-                isOpen={editModalIsOpen}
-                onRequestClose={closeEditModal}
-                contentLabel="Edit Note Modal"
-                className="note-modal"
-                overlayClassName="note-modal-overlay"
-            >
-                {selectedNote && (
-                    <div className="note-content">
-                        <h2 className="note-title">Edit the note</h2>
-                        <div className="note-text-container">
-                            <label htmlFor="editTitle">Title:</label>
-                            <textarea
-                                id="editTitle"
-                                placeholder={`Cannot be empty. Maximal length is ${maxTitleLength} symbols`}
-                                className="input"
-                                value={editTitle}
-                                onChange={(e) => setEditTitle(e.target.value)}
-                                style={{width: '750px', height: '150px', resize: 'none'}}
-                            />
-                            <label htmlFor="editContent">Content:</label>
-                            <textarea
-                                id="editContent"
-                                placeholder={`Cannot be empty. Maximal length is ${maxContentLength} symbols`}
-                                className="input"
-                                value={editContent}
-                                onChange={(e) => setEditContent(e.target.value)}
-                                style={{width: '750px', height: '230px', resize: 'none'}}
-                            ></textarea>
-                        </div>
-                        <button onClick={handleUpdateNote}>Update</button>
-                        <button onClick={closeEditModal}>Close</button>
-                    </div>
-                )}
-            </Modal>
+            <NoteEditModal
+                editModalIsOpen={editModalIsOpen}
+                closeEditModal={closeEditModal}
+                selectedNote={selectedNote}
+                maxTitleLength={maxTitleLength}
+                editTitle={editTitle}
+                setEditTitle={setEditTitle}
+                maxContentLength={maxContentLength}
+                editContent={editContent}
+                setEditContent={setEditContent}
+                handleUpdateNote={handleUpdateNote}
+            />
         </div>
     );
 };

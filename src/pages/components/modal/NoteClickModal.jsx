@@ -1,6 +1,6 @@
 import Modal from "react-modal";
 import React from "react";
-import './NoteClickModal.styles.scss';
+import './NoteModal.styles.scss';
 
 export const NoteClickModal = ({
     modalIsOpen,
