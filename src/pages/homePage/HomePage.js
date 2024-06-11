@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import {fetchNotes, createNote, deleteNoteById, fetchNoteById, updateNoteById, searchNotes} from '../../store/reducers/notes';
 import { selectReducerNotes } from '../../store/selectors/notes';
 import Modal from 'react-modal';
-import "./style/homePage.scss";
 import { ListItem } from "../components/listItem/ListItem";
 import { SearchContainer } from "../components/searchContainer/SearchContainer";
 import { InpContainer } from "../components/inpContainer/InpContainer";
+import { NoteClickModal } from "../components/modal/NoteClickModal";
 
 export const HomePage = () => {
     const dispatch = useDispatch();
@@ -186,37 +186,11 @@ export const HomePage = () => {
                 title={title}
                 content={content}
             />
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
-                contentLabel="Note Details"
-                className="note-modal"
-                overlayClassName="note-modal-overlay"
-            >
-                {selectedNote && (
-                    <div className="note-content">
-                        <h2 className="note-title">{selectedNote.title}</h2>
-                        <div className="note-text-container">
-                            <p className="note-text">{selectedNote.content}</p>
-                        </div>
-                        <div className="note-meta">
-                            <p className="note-time-displaying">
-                                Created: {new Date(selectedNote.createdAt).toLocaleString('en-GB', {
-                                dateStyle: 'medium',
-                                timeStyle: 'medium'
-                            })}
-                            </p>
-                            <p className="note-time-displaying">
-                                Last updated: {new Date(selectedNote.lastUpdatedAt).toLocaleString('en-GB', {
-                                dateStyle: 'medium',
-                                timeStyle: 'medium'
-                            })}
-                            </p>
-                        </div>
-                        <button onClick={closeModal}>Close</button>
-                    </div>
-                )}
-            </Modal>
+            <NoteClickModal
+                closeModal={closeModal}
+                selectedNote={selectedNote}
+                modalIsOpen={modalIsOpen}
+            />
             <Modal
                 isOpen={editModalIsOpen}
                 onRequestClose={closeEditModal}

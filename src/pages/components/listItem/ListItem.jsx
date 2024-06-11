@@ -4,7 +4,8 @@ import './ListItem.styles.scss';
 export const ListItem = ({
      note,
      handleNoteClick,
-     handleEditNote, handleDeleteNote, truncateTitle }) => (
+     handleEditNote, handleDeleteNote, truncateTitle
+}) => (
     <li key={note.id} onClick={() => handleNoteClick(note.id)}>
         {truncateTitle(note.title)}
         <div>
