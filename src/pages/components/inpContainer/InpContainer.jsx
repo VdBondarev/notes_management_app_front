@@ -1,5 +1,13 @@
 import React from "react";
-import './InpContainer.styles.scss';
+import './InputContainer.styles.scss';
+import '../styles.scss';
+import '../buttons.styles.scss';
+
+const inputFieldStyle = {
+    width: '200px',
+    height: '150px',
+    resize: 'none'
+}
 
 export const InpContainer = ({
     maxTitleLength,
@@ -10,7 +18,7 @@ export const InpContainer = ({
     title,
     content
 }) => (
-    <div className="inpContainer">
+    <div className="inputContainer">
         <div>
             <label htmlFor="title">Title:</label>
             <textarea
@@ -19,7 +27,7 @@ export const InpContainer = ({
                 placeholder={`Cannot be empty.\nMaximal length is ${maxTitleLength} symbols`}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                style={{width: '200px', height: '150px', resize: 'none'}}
+                style={ inputFieldStyle }
             />
         </div>
         <div>
@@ -30,10 +38,13 @@ export const InpContainer = ({
                 placeholder={`Cannot be empty.\nMaximal length is ${maxContentLength} symbols`}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                style={{width: '200px', height: '150px', resize: 'none'}}
+                style={ inputFieldStyle }
             ></textarea>
         </div>
-        <button className="btn add" onClick={handleAddNote} style={{height: '80px', fontSize: '15px'}}>
+        <button
+            className="btn add"
+            onClick={handleAddNote}
+        >
             Add a note
         </button>
     </div>

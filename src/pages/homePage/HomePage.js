@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {fetchNotes, createNote, deleteNoteById, fetchNoteById, updateNoteById, searchNotes} from '../../store/reducers/notes';
+import { fetchNotes, createNote, deleteNoteById, fetchNoteById, updateNoteById, searchNotes } from '../../store/reducers/notes';
 import { selectReducerNotes } from '../../store/selectors/notes';
 import { ListItem } from "../components/listItem/ListItem";
 import { SearchContainer } from "../components/searchContainer/SearchContainer";
@@ -21,7 +21,6 @@ export const HomePage = () => {
     const [selectedNote, setSelectedNote] = useState(null);
     const [editTitle, setEditTitle] = useState('');
     const [editContent, setEditContent] = useState('');
-    const maxTitleLengthBeforeTruncating = 15;
     const maxTitleLength = 50;
     const maxContentLength = 20000;
     const [searchTitle, setSearchTitle] = useState('');
@@ -144,13 +143,6 @@ export const HomePage = () => {
         setSelectedNote(null);
     };
 
-    const truncateTitle = (title) => {
-        if (title.length <= maxTitleLengthBeforeTruncating) {
-            return title;
-        }
-        return `${title.slice(0, maxTitleLengthBeforeTruncating)}...`;
-    };
-
     return (
         <div>
             <h1>Notes</h1>
@@ -168,7 +160,6 @@ export const HomePage = () => {
                         handleNoteClick={handleNoteClick}
                         handleEditNote={handleEditNote}
                         handleDeleteNote={handleDeleteNote}
-                        truncateTitle={truncateTitle}
                     />
                 ))}
             </ul>

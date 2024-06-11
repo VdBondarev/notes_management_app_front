@@ -1,4 +1,4 @@
-@import '../../../App';
+@import '../../App';
 
 .btn {
   display: inline-block;
@@ -22,8 +22,9 @@
   &.add {
     background-color: $add-color;
     color: $secondary-color;
+    height: 80px;
+    font-size: 15px;
   }
-
 
   &:hover {
     filter: brightness(90%);

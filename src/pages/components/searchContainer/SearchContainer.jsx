@@ -1,5 +1,11 @@
 import React from "react";
-import './SearchContainer.styles.scss';
+import '../styles.scss';
+
+const inputFieldStyle = {
+    width: '150px',
+    height: '30px',
+    resize: 'none'
+}
 
 export const SearchContainer = ({
     searchTitle,
@@ -20,7 +26,7 @@ export const SearchContainer = ({
                     setPage(0);
                 }
                 }
-                style={{width: '150px', height: '30px', resize: 'none'}}
+                style={ inputFieldStyle }
             />
         </div>
         <div>
@@ -35,7 +41,7 @@ export const SearchContainer = ({
                     setPage(0);
                 }
                 }
-                style={{width: '150px', height: '30px', resize: 'none'}}
+                style={ inputFieldStyle }
             />
         </div>
     </div>
