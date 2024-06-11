@@ -4,8 +4,9 @@ import {fetchNotes, createNote, deleteNoteById, fetchNoteById, updateNoteById, s
 import { selectReducerNotes } from '../../store/selectors/notes';
 import Modal from 'react-modal';
 import "./style/homePage.scss";
-import { ListItem } from "../components/ListItem";
-import { SearchContainer } from "../components/SearchContainer";
+import { ListItem } from "../components/listItem/ListItem";
+import { SearchContainer } from "../components/searchContainer/SearchContainer";
+import { InpContainer } from "../components/inpContainer/InpContainer";
 
 export const HomePage = () => {
     const dispatch = useDispatch();
@@ -176,33 +177,15 @@ export const HomePage = () => {
                 <span>Page {page + 1}</span>
                 <button onClick={handleNextPage} disabled={isLastPage}>→</button>
             </div>
-            <div className="inpContainer">
-                <div>
-                    <label htmlFor="title">Title:</label>
-                    <textarea
-                        id="title"
-                        className="input"
-                        placeholder={`Cannot be empty.\nMaximal length is ${maxTitleLength} symbols`}
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        style={{width: '200px', height: '150px', resize: 'none'}}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="content">Content:</label>
-                    <textarea
-                        id="content"
-                        className="input"
-                        placeholder={`Cannot be empty.\nMaximal length is ${maxContentLength} symbols`}
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        style={{width: '200px', height: '150px', resize: 'none'}}
-                    ></textarea>
-                </div>
-                <button className="btn add" onClick={handleAddNote} style={{height: '80px', fontSize: '15px'}}>
-                    Add a note
-                </button>
-            </div>
+            <InpContainer
+                maxTitleLength={maxTitleLength}
+                setTitle={setTitle}
+                maxContentLength={maxContentLength}
+                setContent={setContent}
+                handleAddNote={handleAddNote}
+                title={title}
+                content={content}
+            />
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
