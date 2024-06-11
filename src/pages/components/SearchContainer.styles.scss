@@ -1,0 +1,18 @@
+@import '../../App.scss';
+
+.input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+
+  &:focus {
+    outline: none;
+    border: 1px $primary-color;
+  }
+
+  &.error {
+    border: 1px $delete-color;
+  }
+}

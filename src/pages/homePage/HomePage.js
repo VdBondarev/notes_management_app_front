@@ -5,6 +5,7 @@ import { selectReducerNotes } from '../../store/selectors/notes';
 import Modal from 'react-modal';
 import "./style/homePage.scss";
 import { ListItem } from "../components/ListItem";
+import { SearchContainer } from "../components/SearchContainer";
 
 export const HomePage = () => {
     const dispatch = useDispatch();
@@ -152,38 +153,13 @@ export const HomePage = () => {
     return (
         <div>
             <h1>Notes</h1>
-            <div className="search-container">
-                <div>
-                    <label htmlFor="searchTitle">Title:</label>
-                    <textarea
-                        id="searchTitle"
-                        className="input"
-                        placeholder="Title"
-                        value={searchTitle}
-                        onChange={(e) => {
-                            setSearchTitle(e.target.value);
-                            setPage(0);
-                        }
-                        }
-                        style={{width: '150px', height: '30px', resize: 'none'}}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="searchContent">Content:</label>
-                    <textarea
-                        id="searchContent"
-                        className="input"
-                        placeholder="Content"
-                        value={searchContent}
-                        onChange={(e) => {
-                            setSearchContent(e.target.value);
-                            setPage(0);
-                        }
-                        }
-                        style={{width: '150px', height: '30px', resize: 'none'}}
-                    />
-                </div>
-            </div>
+            <SearchContainer
+                setPage={setPage}
+                searchTitle={searchTitle}
+                searchContent={searchContent}
+                setSearchTitle={setSearchTitle}
+                setSearchContent={setSearchContent}
+            />
             <ul>
                 {notes.map(note => (
                     <ListItem

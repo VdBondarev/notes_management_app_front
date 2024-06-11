@@ -1,5 +1,6 @@
 import React from "react";
 import './ListItem.styles.scss';
+
 export const ListItem = ({
      note,
      handleNoteClick,
