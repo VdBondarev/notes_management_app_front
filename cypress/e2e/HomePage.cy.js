@@ -56,9 +56,9 @@ describe('Home page', () => {
         const testNoteTitle = 'TEST TITLE';
 
         // Verify that the note contains 'edit' and 'delete' buttons
-        cy.contains(testNoteTitle).within(() => {
-            cy.get('.edit').should('exist');
-            cy.get('.delete').should('exist');
+        cy.contains('.list-item', testNoteTitle).within(() => {
+            cy.get('.buttons .edit').should('exist');
+            cy.get('.buttons .delete').should('exist');
         });
     });
 
@@ -66,8 +66,8 @@ describe('Home page', () => {
         const testNoteTitle = 'TEST TITLE';
 
         // Delete the note
-        cy.contains(testNoteTitle).first().within(() => {
-            cy.get('.delete').click();
+        cy.contains('.list-item', testNoteTitle).within(() => {
+            cy.get('.buttons .delete').click();
         });
     });
 
@@ -84,8 +84,8 @@ describe('Home page', () => {
         cy.contains(testNoteTitle).should('exist');
 
         // Click on the edit button for the note
-        cy.contains(testNoteTitle).first().within(() => {
-            cy.get('.edit').click();
+        cy.contains('.list-item', testNoteTitle).first().within(() => {
+            cy.get('.buttons .edit').click();
         })
 
         // Edit the note title and content
@@ -99,8 +99,8 @@ describe('Home page', () => {
         cy.contains(updatedTestNoteTitle).should('exist');
 
         // delete the note
-        cy.contains(updatedTestNoteTitle).within(() => {
-            cy.get('.delete').click();
-        })
+        cy.contains('.list-item', updatedTestNoteTitle).within(() => {
+            cy.get('.buttons .delete').click();
+        });
     });
 });
