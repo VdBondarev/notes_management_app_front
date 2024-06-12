@@ -2,7 +2,7 @@ import React from "react";
 import '../styles.scss';
 
 const inputFieldStyle = {
-    width: '150px',
+    width: '550px',
     height: '30px',
     resize: 'none'
 }
@@ -19,7 +19,7 @@ export const SearchContainer = ({
             <textarea
                 id="searchTitle"
                 className="input"
-                placeholder="Title"
+                placeholder="Search for notes by title"
                 value={searchTitle}
                 onChange={(e) => {
                     setSearchTitle(e.target.value);
@@ -34,7 +34,7 @@ export const SearchContainer = ({
             <textarea
                 id="searchContent"
                 className="input"
-                placeholder="Content"
+                placeholder="Search for notes by content"
                 value={searchContent}
                 onChange={(e) => {
                     setSearchContent(e.target.value);

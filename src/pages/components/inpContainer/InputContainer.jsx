@@ -1,7 +1,6 @@
 import React from "react";
 import './InputContainer.styles.scss';
 import '../styles.scss';
-import '../buttons.styles.scss';
 
 const inputFieldStyle = {
     width: '200px',

@@ -154,14 +154,18 @@ export const HomePage = () => {
                 setSearchContent={setSearchContent}
             />
             <ul>
-                {notes.map(note => (
-                    <ListItem
-                        note={note}
-                        handleNoteClick={handleNoteClick}
-                        handleEditNote={handleEditNote}
-                        handleDeleteNote={handleDeleteNote}
-                    />
-                ))}
+                {notes.length === 0 ?
+                    <h3 className="no-notes">You don't have notes yet</h3>
+                    :
+                    notes.map(note => (
+                        <ListItem
+                            note={note}
+                            handleNoteClick={handleNoteClick}
+                            handleEditNote={handleEditNote}
+                            handleDeleteNote={handleDeleteNote}
+                        />
+                    ))
+                }
             </ul>
             <div className="pagination">
                 <button onClick={handlePreviousPage} disabled={page === 0}>←</button>
