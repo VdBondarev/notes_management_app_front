@@ -1,6 +1,6 @@
 @import '../../App';
-$secondary-color: #e3f2fd;
-$add-color: #4caf50;
+$secondary-color: #ffffff;
+$add-color: #000000;
 
 .btn {
   display: inline-block;
@@ -16,16 +16,11 @@ $add-color: #4caf50;
     color: $secondary-color;
   }
 
-  &.delete {
-    background-color: $delete-color;
-    color: $secondary-color;
-  }
-
   &.add {
     background-color: $add-color;
     color: $secondary-color;
-    height: 80px;
-    font-size: 15px;
+    height: 100px;
+    font-size: 30px;
   }
 
   &:hover {

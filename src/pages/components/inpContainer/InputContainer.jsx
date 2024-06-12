@@ -9,7 +9,7 @@ const inputFieldStyle = {
     resize: 'none'
 }
 
-export const InpContainer = ({
+export const InputContainer = ({
     maxTitleLength,
     setTitle,
     maxContentLength,
@@ -24,7 +24,7 @@ export const InpContainer = ({
             <textarea
                 id="title"
                 className="input"
-                placeholder={`Cannot be empty.\nMaximal length is ${maxTitleLength} symbols`}
+                placeholder={`Title for a new note. \nCannot be empty.\nMaximal length is ${maxTitleLength} symbols`}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 style={ inputFieldStyle }
@@ -35,7 +35,7 @@ export const InpContainer = ({
             <textarea
                 id="content"
                 className="input"
-                placeholder={`Cannot be empty.\nMaximal length is ${maxContentLength} symbols`}
+                placeholder={`Content for a new note. \nCannot be empty.\nMaximal length is ${maxContentLength} symbols`}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 style={ inputFieldStyle }
@@ -45,7 +45,7 @@ export const InpContainer = ({
             className="btn add"
             onClick={handleAddNote}
         >
-            Add a note
+            Add
         </button>
     </div>
 )

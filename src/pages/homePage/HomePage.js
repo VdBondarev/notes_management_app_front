@@ -4,7 +4,7 @@ import { fetchNotes, createNote, deleteNoteById, fetchNoteById, updateNoteById, 
 import { selectReducerNotes } from '../../store/selectors/notes';
 import { ListItem } from "../components/listItem/ListItem";
 import { SearchContainer } from "../components/searchContainer/SearchContainer";
-import { InpContainer } from "../components/inpContainer/InpContainer";
+import { InputContainer } from "../components/inpContainer/InputContainer";
 import { NoteClickModal } from "../components/modal/NoteClickModal";
 import { NoteEditModal } from "../components/modal/NoteEditModal";
 
@@ -168,7 +168,7 @@ export const HomePage = () => {
                 <span>Page {page + 1}</span>
                 <button onClick={handleNextPage} disabled={isLastPage}>→</button>
             </div>
-            <InpContainer
+            <InputContainer
                 maxTitleLength={maxTitleLength}
                 setTitle={setTitle}
                 maxContentLength={maxContentLength}
