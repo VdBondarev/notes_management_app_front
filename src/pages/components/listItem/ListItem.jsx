@@ -10,10 +10,10 @@ const truncateTitle = (title) => {
 };
 
 export const ListItem = ({
-                             note,
-                             handleNoteClick,
-                             handleEditNote,
-                             handleDeleteNote
+    note,
+    handleNoteClick,
+    handleEditNote,
+    handleDeleteNote
                          }) => (
     <li key={note.id} onClick={() => handleNoteClick(note.id)} className="list-item">
         <div className="title">{truncateTitle(note.title)}</div>
